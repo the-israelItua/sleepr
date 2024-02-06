@@ -5,30 +5,35 @@ import { JwtModule } from '@nestjs/jwt';
 import * as Joi from 'joi';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { LocalStrategy } from './strategies/local.strategy';
 import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [UsersModule, LoggerModule, 
+  imports: [
+    UsersModule,
+    LoggerModule,
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
         MONGODB_URI: Joi.string().required(),
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION: Joi.number().required(),
-        PORT: Joi.number().required()
-      })
-     }),
-    JwtModule.registerAsync({
-    useFactory: (configService: ConfigService) => ({
-      secret: configService.get<string>('JWT_SECRET'),
-      signOptions: {
-        expiresIn: `${configService.get<number>('JWT_EXPIRATION')}s`
-      }
+        PORT: Joi.number().required(),
+      }),
     }),
-    inject: [ConfigService]
-  })
-],
+
+    JwtModule.registerAsync({
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: `${configService.get<number>('JWT_EXPIRATION')}s`,
+        },
+      }),
+      inject: [ConfigService],
+    }),
+  ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
 })
 export class AuthModule {}
