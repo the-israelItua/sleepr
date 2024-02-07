@@ -1,9 +1,7 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
+import { MessagePattern } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
-import { CurrentUser } from './decorators/current-user.decorator';
-import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CreateUserDto } from './users/dtos/create-user.dto';
-import { UsersDocument } from './users/models/users.schema';
 
 @Controller()
 export class AuthController {
@@ -18,4 +16,9 @@ export class AuthController {
   async login(@Body() payload: CreateUserDto) {
     return await this.authService.login(payload)
   }
+
+  @MessagePattern("authenticate")
+  async authenticate() {
+   
+  } 
 }
