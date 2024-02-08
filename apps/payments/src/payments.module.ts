@@ -1,13 +1,13 @@
-import { LoggerModule, RequestUserMiddleware } from '@app/common';
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import * as Joi from 'joi';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { JwtStrategy } from './strategies/jwt.strategy';
-import { LocalStrategy } from './strategies/local.strategy';
-import { UsersModule } from './users/users.module';
+import { JwtStrategy } from 'apps/auth/src/strategies/jwt.strategy';
+import { LocalStrategy } from 'apps/auth/src/strategies/local.strategy';
+import { UsersModule } from 'apps/auth/src/users/users.module';
+import { LoggerModule } from 'nestjs-pino';
+import { PaymentsController } from './payments.controller';
+import { PaymentsService } from './payments.service';
 
 @Module({
   imports: [
@@ -20,6 +20,7 @@ import { UsersModule } from './users/users.module';
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION: Joi.number().required(),
         PORT: Joi.number().required(),
+        STRIPE_SECRET_KEY: Joi.string().required(),
       }),
     }),
 
@@ -33,14 +34,7 @@ import { UsersModule } from './users/users.module';
       inject: [ConfigService],
     }),
   ],
-  controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  controllers: [PaymentsController],
+  providers: [PaymentsService, LocalStrategy, JwtStrategy],
 })
-export class AuthModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(RequestUserMiddleware).forRoutes({
-      path: '*',
-      method: RequestMethod.ALL,
-    });
-  }
-}
+export class PaymentsModule {}

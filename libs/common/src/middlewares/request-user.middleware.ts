@@ -6,7 +6,7 @@ import { Injectable, NestMiddleware, Scope } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
-import { UsersService } from '../users/users.service';
+import { UsersService } from '../../../../apps/auth/src/users/users.service';
 
 @Injectable({ scope: Scope.REQUEST })
 export class RequestUserMiddleware implements NestMiddleware {
@@ -28,9 +28,9 @@ export class RequestUserMiddleware implements NestMiddleware {
             });
             // TODO: Implement caching here in the future
             const user = await this.userService.findOne(userData?.email);
-            req['loggedInUser'] = user;
+            req['user'] = user;
           } catch (error) {
-            req['loggedInUser'] = null;
+            req['user'] = null;
           }
         }
       }

@@ -10,9 +10,8 @@ export class ReservationsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create( @Request() req: any) {
-  console.log(req)
-    return req.user
+  create( @Request() req: any, @Body() createReservationDto: CreateReservationDto) {
+    return this.reservationsService.create(createReservationDto, req.user._id)
   }
 
   @Get()
