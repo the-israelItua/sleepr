@@ -1,18 +1,18 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
 import * as Joi from 'joi';
-import { JwtStrategy } from 'apps/auth/src/strategies/jwt.strategy';
-import { LocalStrategy } from 'apps/auth/src/strategies/local.strategy';
 import { UsersModule } from 'apps/auth/src/users/users.module';
 import { LoggerModule } from 'nestjs-pino';
 import { PaymentsController } from './payments.controller';
 import { PaymentsService } from './payments.service';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { NOTIFICATIONS_SERVICE } from '@app/common';
 
 @Module({
   imports: [
     UsersModule,
     LoggerModule,
+
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
@@ -24,17 +24,21 @@ import { PaymentsService } from './payments.service';
       }),
     }),
 
-    JwtModule.registerAsync({
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: {
-          expiresIn: `${configService.get<number>('JWT_EXPIRATION')}s`,
-        },
-      }),
-      inject: [ConfigService],
-    }),
+    ClientsModule.registerAsync([
+      {
+        name: NOTIFICATIONS_SERVICE,
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.get('NOTIFICATIONS_HOST'),
+            port: configService.get('NOTIFICATIONS_PORT'),
+          },
+        }),
+        inject: [ConfigService],
+      },
+    ])
   ],
   controllers: [PaymentsController],
-  providers: [PaymentsService, LocalStrategy, JwtStrategy],
+  providers: [PaymentsService],
 })
 export class PaymentsModule {}
