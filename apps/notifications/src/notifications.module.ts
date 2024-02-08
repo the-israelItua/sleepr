@@ -19,6 +19,10 @@ import { NotificationsService } from './notifications.service';
         PORT: Joi.number().required(),
         NOTIFICATIONS_PORT: Joi.string().required(),
         NOTIFICATIONS_HOST: Joi.number().required(),
+        SMTP_USER: Joi.string().required(),
+        GOOGLE_AUTH_CLIENT_ID: Joi.string().required(),
+        GOOGLE_AUTH_CLIENT_SECRET: Joi.string().required(),
+        GOOGLE_AUTH_REFRESH_TOKEN: Joi.string().required()
       }),
     }),
   ],
