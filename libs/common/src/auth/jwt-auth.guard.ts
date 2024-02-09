@@ -26,7 +26,6 @@ import { AUTH_SERVICE } from '../contants';
         Authentication: token
       }).pipe(
         tap(res => {
-            console.log(res, "Inguard")
             context.switchToHttp().getRequest().user = res
         }),
         map(() => true)
